@@ -1,0 +1,24 @@
+{
+  "name": "Simple Skill Test",
+  "type": "script",
+  "author": "3Nt9U4mOfijPDRsY",
+  "img": "icons/svg/d20-highlight.svg",
+  "scope": "global",
+  "command": "let skillTest = async function(target, skillName) {\n  skill = target.items.find(i => i.type === \"skill\" && i.name === skillName);\n  if(!skill) {\n    let sysSkill = await game.wfrp4e.utility.findSkill(skillName);\n    let characteristic = sysSkill.system.characteristic.value;\n    let message = `${target.name} does not have the ${skillName} skill. Doing it raw.`;\n    ui.notifications.warn(message, { permanent: false, console: true });\n    setupData = await target.setupCharacteristic(characteristic , { bypass: true })\n  } else {\n    setupData = await target.setupSkill(skill, { bypass: true })\n  }\n  let test = await target.basicTest(setupData);\n  return test.result.outcome;\n}\n\nfunction chooseSkill(html, actor) {\n  var skillName = document.getElementById(\"Skill\").value;\n  skillTest(actor, skillName);\n}\n\n\n\nlet myspeaker = ChatMessage.getSpeaker();\nlet myactor;\nif (speaker.token) myactor = game.actors.tokens[myspeaker.token];\nif (!myactor) myactor = game.actors.get(myspeaker.actor);\n\nif(myactor) {\n  skills = myactor.items.filter(i => i.type === \"skill\").map(s => s.name);\n\n  // Build checkbox list for all skills\n  let skillChoice = `<select id=\"Skill\">`\n  skills.forEach(skill => { skillChoice += `\n    <option value=\"${skill}\">${skill}</option>\n  `\n  });\n  skillChoice += `</select>`;\n\n  new Dialog({\n    title:\"Skill Test\",\n    content:`Skill: <form><div> ${skillChoice} </div></form><br>`,\n    buttons:{\n      roll:{   \n        label:\"Roll test\",\n        callback: (html) => chooseSkill(html, myactor)\n      }\n    }\n  }).render(true);\n} else {\n    ui.notifications.warn(\"No token selected.\", { permanent: false, console: true });\n}",
+  "flags": {
+    "exportSource": {
+      "world": "sandbox",
+      "system": "wfrp4e",
+      "coreVersion": "10.290",
+      "systemVersion": "6.2.1"
+    }
+  },
+  "_stats": {
+    "systemId": "wfrp4e",
+    "systemVersion": "6.2.1",
+    "coreVersion": "10.290",
+    "createdTime": 1669106942380,
+    "modifiedTime": 1669129131936,
+    "lastModifiedBy": "3Nt9U4mOfijPDRsY"
+  }
+}

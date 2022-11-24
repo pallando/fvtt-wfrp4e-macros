@@ -1,0 +1,24 @@
+{
+  "name": "Credit",
+  "type": "script",
+  "author": "EeS7GhKCTrJjl0v7",
+  "img": "icons/svg/dice-target.svg",
+  "scope": "global",
+  "command": "/** \n * Provides a dialog to credit specific players. If you have tokens selected, it will automatically default to try and credit those players.\n * @Author: Pallando\n */\n\nlet users = game.users.filter(user => user.active);\nlet checkOptions = \"\";\nlet playerTokenIds = users.map(u => u.character?.id).filter(id => id !== undefined);\nlet selectedPlayerIds = canvas.tokens.controlled.map(token => {\n  if (playerTokenIds.includes(token.actor.id)) return token.actor.id;\n});\n\n// Build checkbox list for all active players\nusers.forEach(user => {\n  let checked = !!user.character && selectedPlayerIds.includes(user.character.id) && 'checked';\n  checkOptions+=`\n    <br>\n    <input type=\"checkbox\" name=\"${user.id}\" id=\"${user.id}\" value=\"${user.name}\" ${checked}>\\n\n    <label for=\"${user.id}\">${user.name}</label>\n  `\n});\n\nnew Dialog({\n  title:\"Credit\",\n  content:`Credit To: ${checkOptions} <br><br>\n    <table>\n      <tr>\n        <td><label for=\"gc\">Gold Coins:</label></td>\n        <td><input id=\"gc\" name=\"gc\" type=\"number\" min=0 max=10000 value=0></input></td>\n      </tr>\n      <tr />\n      <tr>\n        <td><label for=\"ss\">Silver Shillings:</label></td>\n        <td><input id=\"ss\" name=\"ss\" type=\"number\" min=0 max=10000 value=0></input></td>\n      </tr>\n      <tr />\n      <tr>\n        <td><label for=\"bp\">Brass Pennies:</label></td>\n        <td><input id=\"bp\" name=\"bp\" type=\"number\" min=0 max=10000 value=0></input></td>\n      </tr>\n    </table>\n    <br><br>`,\n  buttons:{\n    credit:{   \n      label:\"Credit\",\n      callback: (html) => createMessage(html)\n    }\n  }\n}).render(true);\n\nfunction createMessage(html) {\n  var sent = false;\n  var gc = html.find('[name=\"gc\"]')[0].value + game.i18n.localize(\"MARKET.Abbrev.GC\").toLowerCase();\n  var ss = html.find('[name=\"ss\"]')[0].value + game.i18n.localize(\"MARKET.Abbrev.SS\").toLowerCase();\n  var bp = html.find('[name=\"bp\"]')[0].value + game.i18n.localize(\"MARKET.Abbrev.BP\").toLowerCase();\n  var messageText = \"/credit \" + gc + ss + bp;\n  for ( let user of users ) {\n    if (html.find('[name=\"'+user.id+'\"]')[0].checked){\n      var messageText2User = messageText  + \" \" + user.name;\n      ui.chat.processMessage(messageText2User);\n      sent = true;\n    }\n  }\n  if(!sent) {\n      ui.chat.processMessage(messageText);\n  }\n}",
+  "flags": {
+    "exportSource": {
+      "world": "warhammer-fantasy",
+      "system": "wfrp4e",
+      "coreVersion": "10.290",
+      "systemVersion": "6.2.1"
+    }
+  },
+  "_stats": {
+    "systemId": "wfrp4e",
+    "systemVersion": "6.2.1",
+    "coreVersion": "10.290",
+    "createdTime": 1668720828509,
+    "modifiedTime": 1668728430860,
+    "lastModifiedBy": "EeS7GhKCTrJjl0v7"
+  }
+}

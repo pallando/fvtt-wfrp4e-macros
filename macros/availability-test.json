@@ -1,0 +1,24 @@
+{
+  "name": "Availability Test",
+  "type": "script",
+  "author": "EeS7GhKCTrJjl0v7",
+  "img": "icons/svg/dice-target.svg",
+  "scope": "global",
+  "command": "/** \n * Provides a dialog to run an \"availability test\".\n * @Author: Pallando\n */\n\nlet settlements = Object.keys(game.wfrp4e.config.availabilityTable);\nlet rarities=Object.keys(game.wfrp4e.config.availabilityTable[settlements[0]])\n\n// Build checkbox list for all possible settlements\nlet settlementChoice = \"<table>\";\nsettlements.forEach(s => {\n  let name = game.i18n.localize(s);\n  settlementChoice +=`\n    <tr>\n      <td><input type=\"radio\" name=\"settlements\" id=\"${name}\" value=\"${name}\"></td>\n      <td><label for=\"${name}\">${name}</label></td>\n    </tr><tr />\n  `\n});\nsettlementChoice += \"</table>\";\n\n// Build checkbox list for all possible rarities\nlet rarityChoice= \"<table>\";\nrarities.forEach(r => {\n  let name = game.i18n.localize(r);\n  rarityChoice +=`\n    <tr>\n      <td><input type=\"radio\" name=\"rarities\" id=\"${name}\" value=\"${name}\"></td>\n      <td><label for=\"${name}\">${name}</label></td>\n    </tr><tr />\n  `\n});\nrarityChoice += \"</table>\";\n\nnew Dialog({\n  title:\"Availability Test\",\n  content:`<br><br>\n    Settlement type: ${settlementChoice}\n    <br><br>\n    Rarity: ${rarityChoice}\n    <br><br>\n    <label for=\"modifier\">Modifier:</label>\n    <input id=\"modifier\" name=\"modifier\" type=\"number\" min=0 max=100 value=0></input>\n    <br><br>`,\n  buttons:{\n    credit:{   \n      label:\"Check availability\",\n      callback: (html) => createMessage(html)\n    }\n  }\n}).render(true);\n\nfunction createMessage(html) {\n  var sent = false;\n  var settlement = document.querySelector('input[name=\"settlements\"]:checked').value;\n  var rarity = document.querySelector('input[name=\"rarities\"]:checked').value;\n  var modifier = html.find('[name=\"modifier\"]')[0].value;\n  var messageText = \"/avail \" + settlement + \" \" + rarity + \" \" + modifier;\n  ui.chat.processMessage(messageText);\n}",
+  "flags": {
+    "exportSource": {
+      "world": "warhammer-fantasy",
+      "system": "wfrp4e",
+      "coreVersion": "10.290",
+      "systemVersion": "6.2.1"
+    }
+  },
+  "_stats": {
+    "systemId": "wfrp4e",
+    "systemVersion": "6.2.1",
+    "coreVersion": "10.290",
+    "createdTime": 1668720828509,
+    "modifiedTime": 1668730801745,
+    "lastModifiedBy": "EeS7GhKCTrJjl0v7"
+  }
+}

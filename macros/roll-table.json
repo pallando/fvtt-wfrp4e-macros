@@ -1,0 +1,24 @@
+{
+  "name": "Roll table",
+  "type": "script",
+  "author": "EeS7GhKCTrJjl0v7",
+  "img": "icons/svg/dice-target.svg",
+  "scope": "global",
+  "command": "/** \n * Provides a dialog to roll a specific table.\n * @Author: Pallando\n */\n\nlet confirmed = false;\nlet tables = game.tables.filter(table => table.getFlag(\"wfrp4e\", \"key\") != \"darkwhispers\");\nlet dropdown = `<select id=\"Table\">`\n\n// Build dropdown list for all tables\ntables.forEach(table => {\n  dropdown += `<option value=\"${table.id}\">${table.name}</option>`\n});\ndropdown += `</select>`\n\nnew Dialog({\n  title:\"Roll table\",\n  content:`Table: <form><div> ${dropdown} </div></form><br>`,\n  buttons: { \n    one: {\n      icon: '<i class=\"fas fa-check\"></i>',\n      label: \"Roll\", callback: () => confirmed = true }, \n    two: { \n      icon: '<i class=\"fas fa-times\"></i>', \n      label: \"Cancel\", callback: () => confirmed = false }\n    }, \n    default: \"Cancel\", \n    close: html => { \n      if (confirmed) { //acquire values from user input\n        var tableId = document.getElementById(\"Table\").value;\n        //let table = tables.filter(table => table.id === tableId);\n        let table = tables.find(table => table.id === tableId);\n        table.draw();\n    }\n  }\n}).render(true);",
+  "flags": {
+    "exportSource": {
+      "world": "warhammer-fantasy",
+      "system": "wfrp4e",
+      "coreVersion": "10.290",
+      "systemVersion": "6.2.1"
+    }
+  },
+  "_stats": {
+    "systemId": null,
+    "systemVersion": null,
+    "coreVersion": null,
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+  }
+}

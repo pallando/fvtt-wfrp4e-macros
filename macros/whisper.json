@@ -1,0 +1,24 @@
+{
+  "name": "Whisper",
+  "type": "script",
+  "author": "EeS7GhKCTrJjl0v7",
+  "img": "icons/svg/dice-target.svg",
+  "scope": "global",
+  "command": "/** \n * Provides a dialog to whisper specific players. If you have tokens selected, it will automatically default to try and whisper those players.\n * @Author: Nelson#3570\n */\n\nlet applyChanges = false;\n\nlet users = game.users.filter(user => user.active);\nlet checkOptions = \"\"\nlet playerTokenIds = users.map(u => u.character?.id).filter(id => id !== undefined);\nlet selectedPlayerIds = canvas.tokens.controlled.map(token => {\n  if (playerTokenIds.includes(token.actor.id)) return token.actor.id;\n});\n\n// Build checkbox list for all active players\nusers.forEach(user => {\n  let checked = !!user.character && selectedPlayerIds.includes(user.character.id) && 'checked';\n  checkOptions+=`\n    <br>\n    <input type=\"checkbox\" name=\"${user.id}\" id=\"${user.id}\" value=\"${user.name}\" ${checked}>\\n\n    <label for=\"${user.id}\">${user.name}</label>\n  `\n});\n\nnew Dialog({\n  title:\"Whisper\",\n  content:`Whisper To: ${checkOptions} <br>\n    <label for=\"message\">Message:</label>\n    <textarea id=\"message\" name=\"message\" rows=\"4\" cols=\"50\"></textarea><br>`,\n  buttons:{\n    whisper:{   \n      label:\"Whisper\",\n      callback: (html) => createMessage(html)\n    }\n  }\n}).render(true);\n\nfunction createMessage(html) {\n  var targets = [];\n  // build list of selected players ids for whispers target\n  for ( let user of users ) {\n    if (html.find('[name=\"'+user.id+'\"]')[0].checked){\n      applyChanges=true;\n      targets.push(user.id);\n    }\n    var messageText = html.find('[name=\"message\"]')[0].value\n  }\nif(!applyChanges)return;\n  ChatMessage.create({\n    content: messageText,\n    whisper: targets\n  });\n}",
+  "flags": {
+    "exportSource": {
+      "world": "warhammer-fantasy",
+      "system": "wfrp4e",
+      "coreVersion": "10.290",
+      "systemVersion": "6.2.1"
+    }
+  },
+  "_stats": {
+    "systemId": null,
+    "systemVersion": null,
+    "coreVersion": null,
+    "createdTime": null,
+    "modifiedTime": null,
+    "lastModifiedBy": null
+  }
+}

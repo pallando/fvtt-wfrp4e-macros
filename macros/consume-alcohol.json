@@ -1,0 +1,24 @@
+{
+  "name": "Consume Alcohol",
+  "type": "script",
+  "scope": "global",
+  "author": "3Nt9U4mOfijPDRsY",
+  "img": "icons/svg/tankard.svg",
+  "command": "let skillTest = async function(target, skillName) {\n  skill = target.items.find(i => i.type === \"skill\" && i.name === skillName);\n  if(!skill) {\n    let sysSkill = await game.wfrp4e.utility.findSkill(skillName);\n    let characteristic = sysSkill.system.characteristic.value;\n    let message = `${target.name} does not have the ${skillName} skill. Doing it raw.`;\n    ui.notifications.warn(message, { permanent: false, console: true });\n    setupData = await target.setupCharacteristic(characteristic, { bypass: false })\n  } else {\n    setupData = await target.setupSkill(skill, { bypass: false })\n  }\n  let test = await target.basicTest(setupData);\n  return test.result.outcome;\n}\n/*\nlet skillTest = async function(skillName) {\n  skill = await game.wfrp4e.utility.findSkill(skillName);\n  let test = await game.wfrp4e.utility.rollItemMacro(skill, \"skill\");\n  return test.result.outcome;\n}*/\n\nlet moreDrunk = async function(actor) {\n  if(actor.hasSystemEffect(\"consumealcohol3\")) {\n    let ca3 = actor.actorEffects.filter(e => e.conditionId == \"consumealcohol3\");\n    let failures = ca3.length + 3;\n    let id = ca3.find(e => e.disabled == false).id;\n    await actor.updateEmbeddedDocuments(\"ActiveEffect\", [{\"_id\":id, \"disabled\":true}])\n    actor.addSystemEffect(\"consumealcohol3\");\n    if(actor.characteristics.t.bonus <= failures) {\n      game.tables.find(table => table.getFlag(\"wfrp4e\", \"key\") == \"stinking-drunk\").draw();\n    }\n  } else if(actor.hasSystemEffect(\"consumealcohol2\")) {\n    actor.removeSystemEffect(\"consumealcohol2\");\n    actor.addSystemEffect(\"consumealcohol3\");\n    if(actor.characteristics.t.bonus <= 3) {\n      game.tables.find(table => table.getFlag(\"wfrp4e\", \"key\") == \"stinking-drunk\").draw();\n    }\n  } else if(actor.hasSystemEffect(\"consumealcohol1\")) {\n    actor.removeSystemEffect(\"consumealcohol1\");\n    actor.addSystemEffect(\"consumealcohol2\");\n    if(actor.characteristics.t.bonus <= 2) {\n      game.tables.find(table => table.getFlag(\"wfrp4e\", \"key\") == \"stinking-drunk\").draw();\n    }\n  } else {\n    actor.addSystemEffect(\"consumealcohol1\");\n    if(actor.characteristics.t.bonus <= 1) {\n      game.tables.find(table => table.getFlag(\"wfrp4e\", \"key\") == \"stinking-drunk\").draw();\n    }\n  }\n}\n\nlet resist = async function(actor) {\n  let consume = game.i18n.translations.NAME.ConsumeAlcohol;\n  let outcome = await skillTest(actor, consume);\n  if(outcome === \"failure\") {\n    moreDrunk(actor);\n  }\n}\n\n\nlet myspeaker = ChatMessage.getSpeaker();\nlet myactor;\nif (speaker.token) myactor = game.actors.tokens[myspeaker.token];\nif (!myactor) myactor = game.actors.get(myspeaker.actor);\n\nif(myactor) {\n  resist(myactor);\n}",
+  "flags": {
+    "exportSource": {
+      "world": "sandbox",
+      "system": "wfrp4e",
+      "coreVersion": "10.290",
+      "systemVersion": "6.2.1"
+    }
+  },
+  "_stats": {
+    "systemId": "wfrp4e",
+    "systemVersion": "6.2.1",
+    "coreVersion": "10.290",
+    "createdTime": 1669120490768,
+    "modifiedTime": 1669128884073,
+    "lastModifiedBy": "3Nt9U4mOfijPDRsY"
+  }
+}
